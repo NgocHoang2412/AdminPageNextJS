@@ -23,8 +23,10 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-export default function Home({itemsService}) {
+var storeItemsUndo = [];
+var storeItemsRedo = [];
 
+export default  function Home({itemsService}) {
 const [items,setItems] = useState(itemsService);
 
 const onDragEnd = e => {
@@ -39,30 +41,46 @@ const onDragEnd = e => {
     e.source.index,
     e.destination.index
   );
-  console.log("itemsReoder == " +JSON.stringify(itemsReoder));
+  storeItemsUndo.push({
+    sourceIndex : e.source.index,
+    destinationIndex : e.destination.index,
+  });
+  console.log("storeItemsUndo == " +JSON.stringify(storeItemsUndo));
+  //console.log("itemsReoder == " +JSON.stringify(itemsReoder));
   setItems(itemsReoder);
 };
 
-const listItems = items.map((item,index) => (
-  <Draggable
-    key={item.id}
-    draggableId={item.id}
-    index={index}
-    
-  > 
-  {(provided, snapshot) => (
-     <div
-      //className="item" 
-      style="background-color:red"
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-     >
-        <h7 >{index} {item.name}</h7>
-        {provided.placeholder}
-      </div> 
-  )}
-  </Draggable>));
+function onClickUNDO(){
+  if(storeItemsUndo.length < 1)  
+    return;
+  let taskUNDO = storeItemsUndo[storeItemsUndo.length -1];
+  storeItemsRedo = taskUNDO;
+  const itemsReoder = reorder(
+    items,
+    taskUNDO.destinationIndex,
+    taskUNDO.sourceIndex
+  );
+  storeItemsUndo.pop();
+  console.log("onClickUNDO == " +JSON.stringify(storeItemsUndo));
+  setItems(itemsReoder);
+}
+function onClickREDO(){
+  if(storeItemsRedo.length < 1)  
+    return;
+
+  const itemsReoder = reorder(
+      items,
+      storeItemsRedo.sourceIndex,
+      storeItemsRedo.destinationIndex
+    );
+    storeItemsRedo = [];
+    storeItemsUndo.push({
+      sourceIndex : storeItemsRedo.destinationIndex,
+      destinationIndex : storeItemsRedo.sourceIndex,
+    }); 
+  console.log("onClickREDO == " +JSON.stringify(storeItemsRedo));
+    setItems(itemsReoder);
+}
 
   return (
     <div className="container">
@@ -111,6 +129,10 @@ const listItems = items.map((item,index) => (
           </Droppable>
 
         </DragDropContext>
+        <div className="button-list" >
+          <button className="button"  onClick={onClickUNDO}>UNDO</button>
+          <button className="button"  onClick={onClickREDO}>REDO</button>
+        </div>
       </main>
    
 
@@ -152,6 +174,18 @@ const listItems = items.map((item,index) => (
           cursor: pointer;
           margin-buttom: 15px;
        }
+       .button-list {
+        padding: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+      }
+       .button {
+        padding: 2px 20px;
+        background-color: #0070f3;
+        margin-buttom: 15px;
+     }
         
       `}</style>
 
@@ -172,3 +206,5 @@ const listItems = items.map((item,index) => (
     </div>
   )
 }
+
+//export default connect()(Home);
