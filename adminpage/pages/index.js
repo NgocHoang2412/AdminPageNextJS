@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import * as authService from '../public/services/auth.service';
 import { DragDropContext, Droppable, Draggable, resetServerContext } from 'react-beautiful-dnd';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 export const getStaticProps = async () => {
   resetServerContext();
@@ -27,7 +27,25 @@ var storeItemsUndo = [];
 var storeItemsRedo = [];
 
 export default  function Home({itemsService}) {
+
 const [items,setItems] = useState(itemsService);
+
+useEffect(() => {
+  if (typeof(Storage) !== "undefined") {
+    let itemStoreLocal= localStorage.getItem("items");
+    if(itemStoreLocal == null)
+    { 
+      localStorage.setItem("items",JSON.stringify(itemsService) );
+    } 
+    else
+    {
+      setItems(JSON.parse(itemStoreLocal));
+    } 
+   } else {
+     console.log("localstorage ----------- undefined");
+   }
+}, [])
+
 
 const onDragEnd = e => {
   console.log("e = " + JSON.stringify(e) );
@@ -46,7 +64,7 @@ const onDragEnd = e => {
     destinationIndex : e.destination.index,
   });
   console.log("storeItemsUndo == " +JSON.stringify(storeItemsUndo));
-  //console.log("itemsReoder == " +JSON.stringify(itemsReoder));
+  localStorage.setItem("items",JSON.stringify(itemsReoder) );
   setItems(itemsReoder);
 };
 
@@ -62,6 +80,7 @@ function onClickUNDO(){
   );
   storeItemsUndo.pop();
   console.log("onClickUNDO == " +JSON.stringify(storeItemsUndo));
+  localStorage.setItem("items",JSON.stringify(itemsReoder) );
   setItems(itemsReoder);
 }
 function onClickREDO(){
@@ -78,7 +97,8 @@ function onClickREDO(){
       sourceIndex : storeItemsRedo.destinationIndex,
       destinationIndex : storeItemsRedo.sourceIndex,
     }); 
-  console.log("onClickREDO == " +JSON.stringify(storeItemsRedo));
+    console.log("onClickREDO == " +JSON.stringify(storeItemsRedo));
+    localStorage.setItem("items",JSON.stringify(itemsReoder) );
     setItems(itemsReoder);
 }
 
@@ -116,7 +136,7 @@ function onClickREDO(){
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                      >
-                        <h7 >{index} {item.name}</h7>
+                        <h7 > {item.name}</h7>
                         {provided.placeholder}
                       </div> 
                   )}
