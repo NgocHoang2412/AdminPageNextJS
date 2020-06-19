@@ -109,9 +109,9 @@ function onClickREDO(){
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h2 >
+        <h1 >
           Welcome to Admin Page!
-        </h2>
+        </h1>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="listItem">
           {(provided, snapshot) => (
@@ -136,7 +136,7 @@ function onClickREDO(){
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                      >
-                        <h7 > {item.name}</h7>
+                        <h3 className="content-item"> {item.name}</h3>
                         {provided.placeholder}
                       </div> 
                   )}
@@ -169,6 +169,7 @@ function onClickREDO(){
         main {
           padding: 4rem 2rem;
           flex: 1;
+          width: 50%;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -184,15 +185,19 @@ function onClickREDO(){
         }
 
         .list-item {
-          justify-content: space-between;
-          margin: 0 auto;
-          padding: 15px;
+          justify-content: center;
+          align-items: center;
+          
         }
         .item {
-          padding: 2px 10px;
+          justify-content: center;
           background-color: #0070f3;
           cursor: pointer;
-          margin-buttom: 15px;
+       }
+       .content-item {
+          padding: 5px;
+          justify-content: center;
+          align-items: center;
        }
        .button-list {
         padding: 10px;
@@ -205,6 +210,8 @@ function onClickREDO(){
         padding: 2px 20px;
         background-color: #0070f3;
         margin-buttom: 15px;
+        font-size: 30px;
+        cursor: pointer;
      }
         
       `}</style>
